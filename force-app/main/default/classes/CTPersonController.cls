@@ -23,7 +23,7 @@ public with sharing class CTPersonController {
   }
 
   //Get people based on a query
-  public static List<Person_c> searchPeople(String query) {
+  public static List<Person__c> searchPeople(String query) {
     query += '%';
     return [
       SELECT
