@@ -49,7 +49,7 @@ public with sharing class CTLocationTracingController {
       WHERE Id = :locationId
     ];
 
-    if (locations != null & locations.sise() > 0) {
+    if (locations != null & locations.size() > 0) {
       return locations[0];
     }
 
