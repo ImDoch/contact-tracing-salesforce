@@ -1,58 +1,21 @@
 public with sharing class CTLocationTracingController {
-  //Get 100 locations whit recent status change
-  public static List<Location__c> getRecentStatusChanges() {
+  public static List<Location_Tracing__c> getVisitors(String locationId) {
     return [
-      SELECT
-        Id,
-        Name,
-        Address__c,
-        Pincode__c,
-        Red_Score__c,
-        Status_Update_Date__c,
-        Status__c
-      FROM Location__c
-      ORDER BY Status_Update_Date__c DESC NULLS LAST
-      LIMIT 100
-    ];
-  }
-
-  //Get locations based on a query
-  public static List<Location__c> searchLocations(String query) {
-    query += '%';
-    return [
-      SELECT
-        Id,
-        Name,
-        Address__c,
-        Pincode__c,
-        Red_Score__c,
-        Status_Update_Date__c,
-        Status__c
-      FROM Location__c
-      WHERE Name LIKE :query OR PinCode__c LIKE :query OR Address__c LIKE :query
-      ORDER BY Status_Update_Date__c DESC NULLS LAST
-    ];
-  }
-
-  //Get a specific location based on an Id
-  public static Location__c getLocationById(String locationId) {
-    List<Location__c> locations = [
-      SELECT
-        Id,
-        Name,
-        Address__c,
-        Pincode__c,
-        Red_Score__c,
-        Status_Update_Date__c,
-        Status__c
-      FROM Location__c
+      SELECT Id, Name, Person__c, Location__c, Visit_Date__c
+      FROM Location_Tracing__c
       WHERE Id = :locationId
+      ORDER BY Visiti_Date__c DESC NULLS LAST
     ];
+  }
 
-    if (locations != null & locations.size() > 0) {
-      return locations[0];
-    }
-
-    return null;
+  public static List<Location_Tracing__c> getLocationsByPersonsId(
+    Set<Id> personIds
+  ) {
+    Date last10Days = Date.today() - 10;
+    return [
+      SELECT Id, Name, Person__c, Location__c, Visit_Date__c
+      FROM Location_Tracing__c
+      WHERE Person__c = :personIds AND Visit_Date__c < :last10Days
+    ];
   }
 }
