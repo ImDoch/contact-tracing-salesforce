@@ -1,21 +1,42 @@
 public with sharing class CTLocationTracingController {
+  //Get last 30 days visitors
   public static List<Location_Tracing__c> getVisitors(String locationId) {
     return [
-      SELECT Id, Name, Person__c, Location__c, Visit_Date__c
+      SELECT
+        Id,
+        Person__c,
+        Location__c,
+        Visit_Date__c,
+        Person__r.Token__c,
+        Person__r.Health_Status__c
       FROM Location_Tracing__c
       WHERE Id = :locationId
-      ORDER BY Visiti_Date__c DESC NULLS LAST
+      ORDER BY Visit_Date__c DESC
     ];
   }
 
+  //Get all locations ids for visitors
   public static List<Location_Tracing__c> getLocationsByPersonsId(
     Set<Id> personIds
   ) {
-    Date last10Days = Date.today() - 10;
     return [
-      SELECT Id, Name, Person__c, Location__c, Visit_Date__c
+      SELECT Id, Person__c, Location__c
       FROM Location_Tracing__c
-      WHERE Person__c = :personIds AND Visit_Date__c < :last10Days
+      WHERE Person__c IN :personIds AND Visit_Date__c = LAST_N_DAYS:10
+    ];
+  }
+
+  //Get all visitors ids for locations
+  public static List<Location_Tracing__c> getLocationsByLocationIds(
+    Set<Id> locationIds
+  ) {
+    return [
+      SELECT Id, Person__c, Location__c
+      FROM Location_Tracing__c
+      WHERE
+        Location__c IN :locationIds
+        AND Person__r.Health_Status__c = 'Green'
+        AND Visit_Date__c = LAST_N_DAYS:10
     ];
   }
 }
